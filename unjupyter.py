@@ -24,7 +24,7 @@ def processOutputs(f, outputs):
 				f.write("```\n")
 				for line in output["text"]:
 					f.write(line)
-				f.write("```\n")
+				f.write("\n```\n")
 		if( "data" in output.keys() ):
 			filetypes = output["data"].keys()
 			for filetype in filetypes:
@@ -56,7 +56,7 @@ with open(outfile, "w") as md:
 				if( len(cell["source"]) > 0 ):
 					md.write("```\n")
 					writeSource(md, cell["source"])
-					md.write("```\n\n")
+					md.write("\n```\n\n")
 				if( len(cell["outputs"]) > 0 ):
 					md.write("Output:\n\n")
 					processOutputs(md, cell["outputs"])
