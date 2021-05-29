@@ -1,18 +1,5 @@
 #!/usr/bin/env python3
-import json, sys, os, base64, hashlib
-
-infile = None
-outfile = None
-
-if( len(sys.argv) == 2 ):
-	infile = sys.argv[1]
-	outfile = os.path.splitext(infile)[0] + ".md"
-elif( len(sys.argv) == 3 ):
-	infile = sys.argv[1]
-	outfile = sys.argv[2]
-else:
-	sys.stderr.write("USAGE: %s <infile.ipynb> [outfile.md]\n")
-	sys.exit(1)
+import json, sys, os, base64, hashlib, glob
 
 def writeSource(f, src):
 	for line in src:
@@ -44,22 +31,42 @@ def processOutputs(f, outputs):
 				else:
 					sys.stderr.write("WARNING: Unsupported data type '%s/%s'\n" % (category, extension))
 
-with open(outfile, "w") as md:
-	with open(infile, "r") as notebook:
-		data = json.load(notebook)
-		cells = data["cells"]
-		for cell in cells:
-			if( cell["cell_type"] == "markdown" ):
-				writeSource(md, cell["source"])
-				md.write("\n\n")
-			elif( cell["cell_type"] == "code" ):
-				if( len(cell["source"]) > 0 ):
-					md.write("```\n")
+def convertNotebook(infile, outfile):
+	with open(outfile, "w") as md:
+		with open(infile, "r") as notebook:
+			data = json.load(notebook)
+			cells = data["cells"]
+			for cell in cells:
+				if( cell["cell_type"] == "markdown" ):
 					writeSource(md, cell["source"])
-					md.write("\n```\n\n")
-				if( len(cell["outputs"]) > 0 ):
-					md.write("Output:\n\n")
-					processOutputs(md, cell["outputs"])
-					md.write("\n")
-sys.stderr.flush()
-print("Notebook '%s' exported as '%s'" % (infile, outfile))
+					md.write("\n\n")
+				elif( cell["cell_type"] == "code" ):
+					if( len(cell["source"]) > 0 ):
+						md.write("```\n")
+						writeSource(md, cell["source"])
+						md.write("\n```\n\n")
+					if( len(cell["outputs"]) > 0 ):
+						md.write("Output:\n\n")
+						processOutputs(md, cell["outputs"])
+						md.write("\n")
+	sys.stderr.flush()
+	print("Notebook '%s' exported as '%s'" % (infile, outfile))
+
+if __name__ == "__main__":
+	if( len(sys.argv) == 2 ):
+		if( os.path.isdir(sys.argv[1]) ):
+			for infile in glob.glob(sys.argv[1]+"/*.ipynb"):
+				outfile = os.path.splitext(infile)[0] + ".md"
+				convertNotebook(infile, outfile)
+		else:
+			infile = sys.argv[1]
+			outfile = os.path.splitext(infile)[0] + ".md"
+			convertNotebook(infile, outfile)
+	elif( len(sys.argv) == 3 ):
+		infile = sys.argv[1]
+		outfile = sys.argv[2]
+		convertNotebook(infile, outfile)
+	else:
+		sys.stderr.write("USAGE: %s <infile.ipynb> [outfile.md]\n")
+		sys.stderr.write("   or: %s <directory>\n")
+		sys.exit(1)

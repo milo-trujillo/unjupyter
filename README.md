@@ -12,6 +12,10 @@ Or, to specify another filename to save as:
 
 	unjupyter foo.ipynb bar.md
 
+Or, to export all notebooks in a directory as markdown:
+
+	unjupyter .
+
 ## Images
 
 When notebooks contain images they are stored as base64 encoded text with no filename. Since we have to choose a filename, we name each image after the md5 checksum of its file contents, with the appropriate image extension.
