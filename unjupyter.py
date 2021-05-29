@@ -33,11 +33,10 @@ def processOutputs(f, outputs):
 				elif( category == "text" and extension == "html" ):
 					sys.stderr.write("Info: Writing raw html because there is no plaintext counterpart :(\n")
 					data = output["data"][filetype]
-					f.write("```\n")
 					writeSource(f, data)
-					f.write("\n```\n\n")
+					f.write("\n\n")
 				else:
-					sys.stderr.write("WARNING: Unsupported data type '%s/%s'\n" % (category, extension))
+					sys.stderr.write("WARNING: Skipping unsupported data type '%s'\n" % (filetype))
 
 def convertNotebook(infile, outfile):
 	with open(outfile, "w") as md:
