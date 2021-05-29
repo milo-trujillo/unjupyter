@@ -28,6 +28,14 @@ def processOutputs(f, outputs):
 					f.write("```\n")
 					writeSource(f, data)
 					f.write("\n```\n\n")
+				elif( category == "text" and extension == "html" and "text/plain" in filetypes ):
+					sys.stderr.write("Info: Ignoring an 'html' output in favor of available plaintext\n")
+				elif( category == "text" and extension == "html" ):
+					sys.stderr.write("Info: Writing raw html because there is no plaintext counterpart :(\n")
+					data = output["data"][filetype]
+					f.write("```\n")
+					writeSource(f, data)
+					f.write("\n```\n\n")
 				else:
 					sys.stderr.write("WARNING: Unsupported data type '%s/%s'\n" % (category, extension))
 
